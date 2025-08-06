@@ -1,4 +1,4 @@
-# ScriptForge AI
+# ScriptGenius
 
 **Your AI-powered writing room for screenplay polishing and dialogue elevation.**  
 Built with LangGraph multi-agent architecture to help writers craft emotionally resonant, stylistically consistent, and punchy scripts — without waiting for notes from five different editors.
