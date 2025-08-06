@@ -1,18 +1,30 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, Trash2, Edit3, Clock, Sparkles, CheckCircle, X, LogOut, User } from 'lucide-react';
-import Link from 'next/link';
-import { documentService, Document } from '@/services/documentService';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useRef, useEffect } from "react";
+import {
+  Upload,
+  FileText,
+  Trash2,
+  Edit3,
+  Clock,
+  Sparkles,
+  CheckCircle,
+  X,
+  LogOut,
+  User,
+  Home,
+} from "lucide-react";
+import Link from "next/link";
+import { documentService, Document } from "@/services/documentService";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
 function EnhancerPageContent() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingName, setEditingName] = useState<string | null>(null);
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,31 +43,33 @@ function EnhancerPageContent() {
       setDocuments(docs);
       setError(null);
     } catch (err) {
-      setError('Failed to load documents');
-      console.error('Error loading documents:', err);
+      setError("Failed to load documents");
+      console.error("Error loading documents:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
       const newDoc = await documentService.uploadDocument({ file });
-      setDocuments(prev => [...prev, newDoc]);
+      setDocuments((prev) => [...prev, newDoc]);
       setSelectedDoc(newDoc);
       setError(null);
-      
+
       // Reset file input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     } catch (err) {
-      setError('Failed to upload document');
-      console.error('Error uploading document:', err);
+      setError("Failed to upload document");
+      console.error("Error uploading document:", err);
     } finally {
       setUploading(false);
     }
@@ -63,18 +77,18 @@ function EnhancerPageContent() {
 
   const enhanceDocument = async (doc: Document) => {
     setIsProcessing(true);
-    
+
     try {
       const enhancedDoc = await documentService.enhanceDocument(doc.id);
-      
-      setDocuments(prev => 
-        prev.map(d => d.id === doc.id ? enhancedDoc : d)
+
+      setDocuments((prev) =>
+        prev.map((d) => (d.id === doc.id ? enhancedDoc : d))
       );
       setSelectedDoc(enhancedDoc);
       setError(null);
     } catch (err) {
-      setError('Failed to enhance document');
-      console.error('Error enhancing document:', err);
+      setError("Failed to enhance document");
+      console.error("Error enhancing document:", err);
     } finally {
       setIsProcessing(false);
     }
@@ -83,14 +97,14 @@ function EnhancerPageContent() {
   const deleteDocument = async (id: string) => {
     try {
       await documentService.deleteDocument(id);
-      setDocuments(prev => prev.filter(d => d.id !== id));
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
       if (selectedDoc?.id === id) {
         setSelectedDoc(null);
       }
       setError(null);
     } catch (err) {
-      setError('Failed to delete document');
-      console.error('Error deleting document:', err);
+      setError("Failed to delete document");
+      console.error("Error deleting document:", err);
     }
   };
 
@@ -101,25 +115,25 @@ function EnhancerPageContent() {
 
   const saveEdit = async (id: string) => {
     try {
-      const updatedDoc = await documentService.updateDocument(id, { name: newName });
-      setDocuments(prev =>
-        prev.map(d => d.id === id ? updatedDoc : d)
-      );
+      const updatedDoc = await documentService.updateDocument(id, {
+        name: newName,
+      });
+      setDocuments((prev) => prev.map((d) => (d.id === id ? updatedDoc : d)));
       if (selectedDoc?.id === id) {
         setSelectedDoc(updatedDoc);
       }
       setEditingName(null);
-      setNewName('');
+      setNewName("");
       setError(null);
     } catch (err) {
-      setError('Failed to update document name');
-      console.error('Error updating document:', err);
+      setError("Failed to update document name");
+      console.error("Error updating document:", err);
     }
   };
 
   const cancelEdit = () => {
     setEditingName(null);
-    setNewName('');
+    setNewName("");
   };
 
   return (
@@ -132,7 +146,7 @@ function EnhancerPageContent() {
               <Sparkles className="text-[#853DCC] h-6 w-6" />
               <h1 className="text-xl font-bold">Document Enhancer</h1>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <User className="h-4 w-4" />
@@ -147,13 +161,13 @@ function EnhancerPageContent() {
               </button>
             </div>
           </div>
-          
+
           {error && (
             <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
-          
+
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
@@ -171,7 +185,7 @@ function EnhancerPageContent() {
               </>
             )}
           </button>
-          
+
           <input
             ref={fileInputRef}
             type="file"
@@ -185,96 +199,103 @@ function EnhancerPageContent() {
           <h2 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
             Documents ({documents.length})
           </h2>
-          
+
           <div className="space-y-2">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="w-8 h-8 border-2 border-[#853DCC] border-t-transparent rounded-full animate-spin"></div>
               </div>
-            ) : documents.map((doc) => (
-              <div
-                key={doc.id}
-                className={`p-3 rounded-lg border transition-colors cursor-pointer ${
-                  selectedDoc?.id === doc.id
-                    ? 'bg-[#853DCC]/20 border-[#853DCC]'
-                    : 'bg-[#1a1a1a] border-gray-700 hover:border-gray-600'
-                }`}
-                onClick={() => setSelectedDoc(doc)}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  {editingName === doc.id ? (
-                    <div className="flex-1 flex gap-2">
-                      <input
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        className="flex-1 bg-[#0a0a0a] border border-gray-600 rounded px-2 py-1 text-sm"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveEdit(doc.id);
-                          if (e.key === 'Escape') cancelEdit();
-                        }}
-                        autoFocus
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          saveEdit(doc.id);
-                        }}
-                        className="text-green-500 hover:text-green-400"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          cancelEdit();
-                        }}
-                        className="text-red-500 hover:text-red-400"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                        <span className="text-sm font-medium truncate" title={doc.name}>
-                          {doc.name.length > 20 ? `${doc.name.substring(0, 20)}...` : doc.name}
-                        </span>
-                      </div>
-                      <div className="flex gap-1">
+            ) : (
+              documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className={`p-3 rounded-lg border transition-colors cursor-pointer ${
+                    selectedDoc?.id === doc.id
+                      ? "bg-[#853DCC]/20 border-[#853DCC]"
+                      : "bg-[#1a1a1a] border-gray-700 hover:border-gray-600"
+                  }`}
+                  onClick={() => setSelectedDoc(doc)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    {editingName === doc.id ? (
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          className="flex-1 bg-[#0a0a0a] border border-gray-600 rounded px-2 py-1 text-sm"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEdit(doc.id);
+                            if (e.key === "Escape") cancelEdit();
+                          }}
+                          autoFocus
+                        />
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            startEditing(doc);
+                            saveEdit(doc.id);
                           }}
-                          className="text-gray-400 hover:text-white p-1"
+                          className="text-green-500 hover:text-green-400"
                         >
-                          <Edit3 className="h-3 w-3" />
+                          <CheckCircle className="h-4 w-4" />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            deleteDocument(doc.id);
+                            cancelEdit();
                           }}
-                          className="text-gray-400 hover:text-red-400 p-1"
+                          className="text-red-500 hover:text-red-400"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <span
+                            className="text-sm font-medium truncate"
+                            title={doc.name}
+                          >
+                            {doc.name.length > 20
+                              ? `${doc.name.substring(0, 20)}...`
+                              : doc.name}
+                          </span>
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEditing(doc);
+                            }}
+                            className="text-gray-400 hover:text-white p-1"
+                          >
+                            <Edit3 className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteDocument(doc.id);
+                            }}
+                            className="text-gray-400 hover:text-red-400 p-1"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                    {doc.enhanced && (
+                      <span className="bg-[#853DCC] text-white px-2 py-1 rounded-full">
+                        Enhanced
+                      </span>
+                    )}
+                  </div>
                 </div>
-                
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
-                  {doc.enhanced && (
-                    <span className="bg-[#853DCC] text-white px-2 py-1 rounded-full">
-                      Enhanced
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -288,19 +309,19 @@ function EnhancerPageContent() {
                 <div>
                   <h2 className="text-2xl font-bold">{selectedDoc.name}</h2>
                   <p className="text-gray-400">
-                    Uploaded {new Date(selectedDoc.uploadedAt).toLocaleDateString()}
+                    Uploaded{" "}
+                    {new Date(selectedDoc.uploadedAt).toLocaleDateString()}
                   </p>
                 </div>
-                
+
                 <div className="flex gap-3">
                   <Link
-                    href={`/enhancer/${selectedDoc.id}`}
+                    href={`/`}
                     className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105"
                   >
-                    <Edit3 className="h-4 w-4" />
-                    Open in Editor
+                    <Home className="h-5 w-5" />
                   </Link>
-                  
+
                   {!selectedDoc.enhanced && (
                     <button
                       onClick={() => enhanceDocument(selectedDoc)}
@@ -315,7 +336,9 @@ function EnhancerPageContent() {
                       ) : (
                         <>
                           <Sparkles className="h-5 w-5" />
-                          <span className="font-semibold">Enhance Document</span>
+                          <span className="font-semibold">
+                            Enhance Document
+                          </span>
                         </>
                       )}
                     </button>
@@ -328,9 +351,12 @@ function EnhancerPageContent() {
               {isProcessing ? (
                 <div className="flex flex-col items-center justify-center h-full">
                   <div className="w-16 h-16 border-4 border-[#853DCC] border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <h3 className="text-xl font-semibold mb-2">AI Enhancement in Progress</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    AI Enhancement in Progress
+                  </h3>
                   <p className="text-gray-400 text-center max-w-md">
-                    Our AI is analyzing your document and generating improvements. This process takes approximately 10 seconds.
+                    Our AI is analyzing your document and generating
+                    improvements. This process takes approximately 10 seconds.
                   </p>
                 </div>
               ) : selectedDoc.enhanced ? (
@@ -343,21 +369,23 @@ function EnhancerPageContent() {
                       </div>
                       Enhanced Version
                     </h3>
-                    
+
                     <div className="bg-[#0a0a0a]/50 border border-[#853DCC]/20 rounded-xl p-6 backdrop-blur-sm">
                       <pre className="text-base text-white whitespace-pre-wrap leading-relaxed font-mono">
                         {selectedDoc.enhancedContent}
                       </pre>
                     </div>
-                    
+
                     <div className="mt-6 flex gap-4">
-                      <Link
+                      {/* <Link
                         href={`/enhancer/${selectedDoc.id}`}
                         className="bg-gradient-to-r from-[#853DCC] to-[#0d9668] hover:from-[#0d9668] hover:to-[#853DCC] text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
                       >
                         <Edit3 className="h-5 w-5" />
-                        <span className="font-semibold">Edit Enhanced Version</span>
-                      </Link>
+                        <span className="font-semibold">
+                          Edit Enhanced Version
+                        </span>
+                      </Link> */}
                     </div>
                   </div>
 
@@ -368,8 +396,18 @@ function EnhancerPageContent() {
                         <FileText className="h-5 w-5" />
                         View Original Content
                         <div className="ml-auto transform group-open:rotate-180 transition-transform">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         </div>
                       </summary>
@@ -389,14 +427,21 @@ function EnhancerPageContent() {
                       </div>
                       AI Improvements Applied
                     </h3>
-                    
+
                     <div className="grid gap-4">
                       {selectedDoc.improvements?.map((improvement, index) => (
-                        <div key={index} className="flex items-start gap-4 p-4 bg-gradient-to-r from-[#0a0a0a] to-[#1a1a1a] rounded-xl border border-gray-800 hover:border-gray-600 transition-colors">
+                        <div
+                          key={index}
+                          className="flex items-start gap-4 p-4 bg-gradient-to-r from-[#0a0a0a] to-[#1a1a1a] rounded-xl border border-gray-800 hover:border-gray-600 transition-colors"
+                        >
                           <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">{index + 1}</span>
+                            <span className="text-white font-bold text-sm">
+                              {index + 1}
+                            </span>
                           </div>
-                          <span className="text-gray-200 leading-relaxed">{improvement}</span>
+                          <span className="text-gray-200 leading-relaxed">
+                            {improvement}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -410,22 +455,26 @@ function EnhancerPageContent() {
                     </div>
                     Document Preview
                   </h3>
-                  
+
                   <div className="bg-[#0a0a0a]/50 border border-gray-600 rounded-xl p-6 backdrop-blur-sm">
                     <pre className="text-base text-gray-200 whitespace-pre-wrap leading-relaxed font-mono">
                       {selectedDoc.content}
                     </pre>
                   </div>
-                  
+
                   <div className="mt-8 p-6 bg-gradient-to-r from-[#1e293b] to-[#111] border border-[#853DCC]/30 rounded-xl">
                     <div className="flex items-start gap-4">
                       <div className="p-2 bg-[#853DCC] rounded-lg flex-shrink-0">
                         <Sparkles className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-[#853DCC] font-bold text-lg mb-2">Ready for AI Enhancement</p>
+                        <p className="text-[#853DCC] font-bold text-lg mb-2">
+                          Ready for AI Enhancement
+                        </p>
                         <p className="text-gray-300 leading-relaxed">
-                          Transform this content with AI-powered improvements including better structure, enhanced clarity, improved grammar, and more engaging language.
+                          Transform this content with AI-powered improvements
+                          including better structure, enhanced clarity, improved
+                          grammar, and more engaging language.
                         </p>
                       </div>
                     </div>
@@ -435,22 +484,37 @@ function EnhancerPageContent() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-md">
-              <FileText className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">No Document Selected</h2>
-              <p className="text-gray-400 mb-6">
-                Upload a document or select one from the sidebar to get started with AI enhancement.
-              </p>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="bg-gradient-to-r from-[#853DCC] to-[#0d9668] hover:from-[#0d9668] hover:to-[#853DCC] text-white px-8 py-4 rounded-xl transition-all duration-300 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <Upload className="h-6 w-6" />
-                <span className="font-bold text-lg">Upload Your First Document</span>
-              </button>
+          <>
+            <div className="flex items-center justify-between flex-row-reverse p-2">
+              <Link
+              href={`/`}
+              className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105"
+            >
+              <Home className="h-5 w-5" />
+            </Link>
             </div>
-          </div>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center max-w-md">
+                <FileText className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <h2 className="text-xl font-semibold mb-2">
+                  No Document Selected
+                </h2>
+                <p className="text-gray-400 mb-6">
+                  Upload a document or select one from the sidebar to get
+                  started with AI enhancement.
+                </p>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-gradient-to-r from-[#853DCC] to-[#0d9668] hover:from-[#0d9668] hover:to-[#853DCC] text-white px-8 py-4 rounded-xl transition-all duration-300 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <Upload className="h-6 w-6" />
+                  <span className="font-bold text-lg">
+                    Upload Your First Document
+                  </span>
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
